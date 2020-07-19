@@ -9,24 +9,6 @@ var paysafeApiClient = new PaysafeApiClient(
   config.paysafeEnvironment,
   config.paysafeAccountNumber
 );
-// console.log(paysafeApiClient);
-//var merchantRefNumber = Math.random().toString(36).slice(2);
-var randomFixedInteger = function (length) {
-  return Math.floor(
-    Math.pow(10, length - 1) +
-      Math.random() * (Math.pow(10, length) - Math.pow(10, length - 1) - 1)
-  );
-};
-export const create = (req, res, next) => {
-  if (req.body) {
-    console.log(req.body);
-
-    res.status(200).send({
-      message: "Sucess",
-      token_received: req.body.token,
-    });
-  }
-};
 
 export const checkStatus = (req, res) => {
   paysafeApiClient
