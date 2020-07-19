@@ -1,0 +1,80 @@
+<html>
+
+<head>
+    <script src="https://hosted.paysafe.com/checkout/v1/latest/paysafe.checkout.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+</head>
+
+
+<body>
+
+    <div class="container">
+        <form>
+            <div class="form-group">
+                <label for="amount">Email Amount</label>
+                <input type="int" class="form-control" id="amount" aria-describedby="emailHelp"
+                    placeholder="Enter amount" value=100>
+            </div>
+
+
+            <button class="btn btn-primary" id="paynow">Pay Now</button>
+        </form>
+
+    </div>
+
+</body>
+
+<script>
+
+    let payNowBtn = document.getElementById("paynow");
+    payNowBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        let amount = document.getElementById("amount").value;
+
+        checkout(parseInt(amount) * 100);
+    })
+
+    function checkout(amount) {
+        const api_key =
+            "T1QtNDkzMDcwOkItcWEyLTAtNWYxMzJiNDctMC0zMDJjMDIxNDI1NzBiMWY0ZDdmNzhjY2Q1NzhmYTUzYzNjMzExYmM5NTU2ZGNjMDIwMjE0MmMxNzVhNjJkNzZmMzkwMjkxODJiMmNmODc2OGU1YWVhZmFhZWNjZA==";
+        paysafe.checkout.setup(api_key, {
+            amount: amount,
+            currency: "USD",
+            environment: "TEST",
+            companyName: "Example Inc."
+        }, function (instance, error, result) {
+            console.log(result);
+
+            if (result.token) {
+                console.log(result.token);
+                console.log(result.paymentMethod);
+
+                if (result.paymentMethod == "Cards") {
+
+                    // use AJAX to send result.token to your merchant server to take CC payment
+                    axios.post("/api/cardpayment", {
+                        token: result.token,
+                        amount: amount
+                    }).then(response => {
+                        console.log(response.data);
+                        if (response.data.status === "COMPLETED") {
+                            instance.showSuccessScreen("Payment success")
+                        }
+                    }).catch(e => console.log(e));
+                } else {
+                    instance.showFailureScreen("Only Card Option is available")
+                }
+
+
+            } else {
+                // error handling
+                instance.showFailureScreen("Payment Failed")
+            }
+        });
+    }
+</script>
+
+</html>
